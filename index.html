@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PESTLE Calculator</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-glow" aria-hidden="true"></div>
+
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-badge">PESTLE</div>
+        <div>
+          <h1 data-i18n="appTitle">PESTLE-вычислитель</h1>
+          <p class="subtitle" data-i18n="appSubtitle">
+            Анализ макросреды: взвешенные баллы (−25…+25), график и экспорт
+          </p>
+        </div>
+      </div>
+
+      <div class="topbar-controls">
+        <div class="lang-switch" role="group" aria-label="Language selector">
+          <button type="button" class="lang-btn is-active" data-lang="ru">RU</button>
+          <button type="button" class="lang-btn" data-lang="en">EN</button>
+          <button type="button" class="lang-btn" data-lang="hy">HY</button>
+        </div>
+
+        <button type="button" class="btn btn-secondary" id="openInfoBtn" aria-haspopup="dialog" aria-controls="infoModal">
+          <span class="info-dot" aria-hidden="true">i</span>
+          <span data-i18n="infoBtn">Инфо</span>
+        </button>
+        <button type="button" class="btn btn-secondary" id="loadDemoBtn" data-i18n="loadDemo">
+          Загрузить пример
+        </button>
+        <button type="button" class="btn btn-danger-ghost" id="resetAllBtn" data-i18n="clearAll">
+          Очистить
+        </button>
+        <button type="button" class="btn btn-secondary" id="themeToggleBtn">
+          Тема: Тёмная
+        </button>
+      </div>
+    </header>
+
+    <section class="summary-grid" aria-label="Key metrics">
+      <article class="card metric-card">
+        <span class="metric-label" data-i18n="favorabilityIndexLabel">Индекс благоприятности</span>
+        <strong class="metric-value" id="favorabilityIndex">50%</strong>
+        <span class="metric-hint" id="favorabilityCaption">Нейтральный фон</span>
+      </article>
+
+      <article class="card metric-card">
+        <span class="metric-label" data-i18n="netScoreLabel">Суммарный балл</span>
+        <strong class="metric-value" id="netScoreValue">0</strong>
+        <span class="metric-hint" id="factorsCountCaption">Факторов: 0</span>
+      </article>
+
+      <article class="card metric-card">
+        <span class="metric-label" data-i18n="oppThreatLabel">Возможности / Угрозы</span>
+        <strong class="metric-value" id="oppThreatRatio">0 / 0</strong>
+        <span class="metric-hint" id="maxMinCaption">Макс: 0 · Мин: 0</span>
+      </article>
+    </section>
+
+    <main class="main-grid">
+      <section class="card workspace-card">
+        <div class="tabs-bar" role="tablist" id="categoryTabs"></div>
+
+        <div class="category-meta" id="categoryMeta"></div>
+
+        <form class="factor-form" id="factorForm">
+          <div class="form-row">
+            <div class="field field-span-2">
+              <label for="factorTitle" data-i18n="factorTitleLabel">Название фактора</label>
+              <input
+                type="text"
+                id="factorTitle"
+                data-i18n-placeholder="factorTitlePlaceholder"
+                placeholder="Например: Рост спроса на автоматизацию процессов"
+                required
+              />
+            </div>
+
+            <div class="field">
+              <label for="factorType" data-i18n="factorTypeLabel">Тип влияния</label>
+              <select id="factorType"></select>
+            </div>
+          </div>
+
+          <div class="form-row category-horizon-row">
+            <div class="field">
+              <label for="factorCategory" data-i18n="categoryLabel">Категория</label>
+              <select id="factorCategory"></select>
+            </div>
+
+            <div class="field">
+              <label for="factorHorizon" data-i18n="horizonLabel">Горизонт</label>
+              <select id="factorHorizon"></select>
+            </div>
+          </div>
+
+          <div class="form-row sliders-row">
+            <div class="field">
+              <label for="factorImportance">
+                <span data-i18n="importanceLabel">Важность</span>: <strong id="importanceOut">3</strong> / 5
+              </label>
+              <input type="range" id="factorImportance" min="1" max="5" value="3" />
+            </div>
+
+            <div class="field">
+              <label for="factorImpact">
+                <span data-i18n="impactLabel">Сила / вероятность</span>: <strong id="impactOut">3</strong> / 5
+              </label>
+              <input type="range" id="factorImpact" min="1" max="5" value="3" />
+            </div>
+
+            <div class="field preview-box">
+              <span class="preview-label" data-i18n="scorePreviewLabel">Балл фактора</span>
+              <strong class="preview-score" id="scorePreview">+9</strong>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="factorAction" data-i18n="actionLabel">Комментарий / план действий</label>
+            <input
+              type="text"
+              id="factorAction"
+              data-i18n-placeholder="actionPlaceholder"
+              placeholder="Краткая заметка или шаг по использованию возможности / снижению риска"
+            />
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary" id="submitFactorBtn" data-i18n="addFactorBtn">
+              Добавить фактор
+            </button>
+            <button type="button" class="btn btn-secondary hidden" id="cancelEditBtn" data-i18n="cancelEditBtn">
+              Отменить правку
+            </button>
+          </div>
+        </form>
+
+        <div class="toolbar">
+          <div class="filter-group">
+            <select id="typeFilter" aria-label="Filter by type"></select>
+            <select id="sortSelect" aria-label="Sort factors"></select>
+          </div>
+        </div>
+
+        <div class="factors-list" id="factorsList"></div>
+      </section>
+
+      <aside class="sidebar-stack">
+        <section class="card chart-card">
+          <div class="chart-header">
+            <h2 data-i18n="chartTitle">Визуализация</h2>
+            <div class="segmented" role="group" aria-label="Chart mode">
+              <button type="button" class="seg-btn is-active" data-chart-mode="radar" data-i18n="radarMode">
+                Радар
+              </button>
+              <button type="button" class="seg-btn" data-chart-mode="balance" data-i18n="balanceMode">
+                Баланс
+              </button>
+            </div>
+          </div>
+
+          <div class="canvas-wrap">
+            <canvas id="pestleCanvas" width="420" height="300"></canvas>
+          </div>
+
+          <div class="category-scores-table" id="categoryBreakdown"></div>
+        </section>
+
+        <section class="card top-lists-card">
+          <h3 data-i18n="topOpportunitiesTitle">Топ-3 возможности</h3>
+          <ul class="top-list" id="topOpportunities"></ul>
+
+          <h3 class="mt-16" data-i18n="topThreatsTitle">Топ-3 угрозы</h3>
+          <ul class="top-list" id="topThreats"></ul>
+        </section>
+
+        <section class="card export-card">
+          <h3 data-i18n="exportTitle">Экспорт отчёта</h3>
+          <div class="export-buttons">
+            <button type="button" class="btn btn-secondary" id="copySummaryBtn" data-i18n="copyTextBtn">
+              Копировать текст
+            </button>
+            <button type="button" class="btn btn-secondary" id="exportCsvBtn" data-i18n="downloadCsvBtn">
+              Скачать CSV
+            </button>
+            <button type="button" class="btn btn-secondary" id="exportJsonBtn" data-i18n="downloadJsonBtn">
+              Скачать JSON
+            </button>
+          </div>
+          <pre class="summary-preview" id="summaryPreview"></pre>
+        </section>
+      </aside>
+    </main>
+
+    <footer class="footer">
+      <span>(C) Karlos Hakobyan</span>
+      <span id="saveStatus">Сохранено локально</span>
+    </footer>
+  </div>
+
+  <div class="modal-backdrop hidden" id="infoModal" role="dialog" aria-modal="true" aria-labelledby="infoModalTitle">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 id="infoModalTitle" data-i18n="infoModalTitle">О методике PESTLE и инструкция</h2>
+        <button type="button" class="modal-close" id="closeInfoBtn" aria-label="Close modal">✕</button>
+      </div>
+
+      <div class="modal-body" id="infoModalBody"></div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="okInfoBtn" data-i18n="infoCloseBtn">
+          Понятно
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
